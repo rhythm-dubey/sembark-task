@@ -13,7 +13,7 @@ class RoleAbility
 
     public static function canViewShortUrls(Role $role): bool
     {
-        return $role->name === 'super_admin';
+        return in_array($role->name, ['super_admin', 'admin', 'member'], true);
     }
 
     public static function canInvite(Role $role): bool

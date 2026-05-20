@@ -33,18 +33,26 @@ class ShortUrl extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function isVisibleTo(User $viewer): bool
+    {
+        return match ($viewer->role?->name) {
+            'super_admin' => true,
+            'admin' => $this->company_id === $viewer->company_id,
+            'member' => $this->user_id === $viewer->id,
+            default => false,
+        };
+    }
+
     /**
      * @param  Builder<self>  $query
      */
     public function scopeVisibleTo(Builder $query, User $viewer): Builder
     {
-        $roleName = $viewer->role?->name;
-
-        return match ($roleName) {
-            'super_admin' => $query->whereRaw('1 = 0'),
-            'admin' => $query->where('company_id', '!=', $viewer->company_id),
-            'member' => $query->where('user_id', '!=', $viewer->id),
-            default => $query->where('company_id', $viewer->company_id),
+        return match ($viewer->role?->name) {
+            'super_admin' => $query,
+            'admin' => $query->where('company_id', $viewer->company_id),
+            'member' => $query->where('user_id', $viewer->id),
+            default => $query->whereRaw('1 = 0'),
         };
     }
 }
