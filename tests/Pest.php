@@ -15,7 +15,7 @@ use Tests\TestCase;
 */
 
 pest()->extend(TestCase::class)
- // ->use(RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
 
 /*
@@ -44,7 +44,31 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+use App\Models\Role;
+use App\Models\ShortUrl;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+
+function createUserWithRole(string $roleName, ?int $companyId = null): User
 {
-    // ..
+    return User::query()->create([
+        'name' => ucfirst(str_replace('_', ' ', $roleName)),
+        'email' => fake()->unique()->safeEmail(),
+        'password' => Hash::make('password'),
+        'role_id' => Role::query()->where('name', $roleName)->value('id'),
+        'company_id' => $companyId,
+        'email_verified_at' => now(),
+    ]);
+}
+
+function createShortUrlFor(User $user, string $originalUrl): ShortUrl
+{
+    return ShortUrl::query()->create([
+        'company_id' => $user->company_id,
+        'user_id' => $user->id,
+        'code' => Str::lower(Str::random(8)),
+        'original_url' => $originalUrl,
+        'hits' => 0,
+    ]);
 }
