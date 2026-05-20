@@ -11,7 +11,6 @@ class StoreInvitationRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        // dd($this->role_id);
         return $this->user()?->can('create', Invitation::class) ?? false;
     }
 
