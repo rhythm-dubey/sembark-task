@@ -22,9 +22,4 @@ class ShortUrlPolicy
     {
         return RoleAbility::canCreateShortUrls($user->role);
     }
-
-    public function resolve(?User $user): bool
-    {
-        return $user !== null;
-    }
 }
