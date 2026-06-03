@@ -12,6 +12,9 @@ class ShortUrlRedirectController extends Controller
     {
         $shortUrl = ShortUrl::query()->where('code', $code)->firstOrFail();
 
+        // $shortUrl->hits++;
+        // $shortUrl->save();
+
         $shortUrl->increment('hits');
 
         return redirect()->away($shortUrl->original_url);
